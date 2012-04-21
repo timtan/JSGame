@@ -214,9 +214,9 @@ function Hero(context, rect, character, font, fontColor){
     }
 
 	self.create_weapon = function() {
-	    var rect = new tm.Rect(self.rect.centerXY().x,self.rect.centerXY().y,50,50);
+	    var rect = new tm.Rect(self.rect.centerXY().x,self.rect.centerXY().y,10,30);
     	rect.speed({x:1, y:0});
-    	var myWeapon = new Weapon(self.context, rect,"喵", "20pt Calibri", "#963");
+    	var myWeapon = new Weapon(self.context, rect,"喵", "20pt Calibri", "#FC8");
 		return myWeapon;
 	}
     return self;
@@ -266,7 +266,7 @@ function Weapon(context, rect, character, font, fontColor){
         self.context.translate(self.rect.x, self.rect.y);
         self.context.font = self.font;
 		self.context.fillStyle = "rgba(255, 0, 0, " + self.alpha + ")";
-        self.context.fillText(self.character, 0, 0);
+        self.context.fillText("掰", 0, 0);
         self.context.restore();
 
 		self.alpha = self.alpha - 0.05;
@@ -294,13 +294,13 @@ $(document).ready(function(){
     context = canvas.getContext('2d');
     rect = new tm.Rect(10,10,100,40);
     rect.speed({x:0,y:0});
-    hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#396");
+    hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#F0F");
 
-    enemy_rect = new tm.Rect(610,710,100,40);
-    enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#369");
+    enemy_rect = new tm.Rect(610,710,40,40);
+    enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#39C");
 
 
-    enemy2 = new Enemy(context, new tm.Rect(610,110,100,40),"肥肥", "45pt Calibri", "#569");
+    enemy2 = new Enemy(context, new tm.Rect(610,110,50,40),"肥肥", "45pt Calibri", "#FF0");
 
     enemy.setHero(hero);
     enemy2.setHero(hero);
