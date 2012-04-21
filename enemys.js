@@ -38,10 +38,10 @@ function Enemy(context, rect, character, font, fontColor){
         self.context.translate(self.rect.x, self.rect.y);  // move far away
 
         self.context.rotate(self.angel* Math.PI/180);  // rotate
-        self.context.translate(-0.5 * self.rect.width,-0.5*self.rect.height); //Move To Center
+        self.context.translate(-0.5 * self.rect.width, -0.5 * self.rect.height); //Move To Center
         self.context.font = self.font;
-        self.context.fillStyle = self.fontColor;
-        self.context.fillText(self.character, 0, 0);
+        self.context.fillStyle = "#CCC";
+        self.context.fillText("啊～", 0, 0);
         self.context.restore();
     }
     self.setFont = function(font){
@@ -60,7 +60,7 @@ function Enemy(context, rect, character, font, fontColor){
             self.rect.y += Math.abs(_y_diff)/2 > 1 ? _y_diff/Math.abs(_y_diff)*1 :_y_diff%1;
         }
        if(self.status == tm.status.bump){
-           self.angel +=4;
+           self.angel +=10;
            console.log(self.angel);
            if( self.angel > 360 ){
                self.status = tm.status.die;
