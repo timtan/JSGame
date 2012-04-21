@@ -14,6 +14,35 @@
 // for translation
 // http://blog.iamjason.com/2010/11/html5-canvas.html
 tm = {};
+tm.ActorQueue = function (){
+    var self = this;
+    self.queue = [];
+    return self;
+}
+tm.ActorQueue.prototype.push = function(actor){
+    this.queue.push(actor);
+}
+tm.ActorQueue.prototype.update = function(actor){
+    this.queue.forEach(function(ele){ele.update()});
+}
+tm.ActorQueue.prototype.draw = function(actorQueue){
+    this.queue.forEach(function(ele){ele.draw()});
+}
+tm.ActorQueue.prototype.detectIntersection = function(thatQueue, autoRemove){
+    autoRemove = autoRemove ? true :autoRemove;
+    var intersections = [];
+    for( var i = 0; i< this.queue.length; ++i){
+        var my_actor = this.queue[i];
+        for( var j = 0 ; j< thatQueue.queue.length; ++j){
+            var that_actor = thatQueue.queue[j];
+            if( my_actor.rect.intersect(that_actor.rect)){
+                intersections.push(my_actor, that_actor);
+            }
+        }
+    }
+    return intersections;
+}
+
 tm.Rect = function (x,y, width, height){
     var self = this;
     self.x = x;
@@ -53,23 +82,18 @@ tm.Rect.prototype.move = function(){
     //console.log(cxy.x + "" + cxy.y);
     this.centerXY(cxy);
 }
+tm.Rect.prototype.intersect = function(that){
+    var my_cxy  = this.centerXY();
+    var that_cxy = that.centerXY();
+    if( Math.abs(my_cxy.x - that_cxy.x) < Math.max( this.width, that.width) &&
+        Math.abs(my_cxy.y - that_cxy.y) < Math.max( this.height, that.height)){
+        return true;
+    }
+    return false;
+}
+
 tm.draw = {}
 
-
-
-tm.draw.translate = function(context, x,y, inner){
-    context.save();
-    context.translate(x, y);
-    inner();
-    context.restore();
-}
-
-tm.draw.rotate = function(context, angel, inner){
-    context.save();
-    context.rotate(angel* Math.PI/180);
-    inner();
-    context.restore();
-}
 tm.draw.fill = function(context, w, h, style){
     context.beginPath();
     context.rect(0, 0, w, h);
@@ -107,7 +131,7 @@ function fill_vec(event){
     }
 }
 $(document).keydown(function(e){
-    if((e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown) || 
+    if((e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown) ||
 	   (e.keyCode == tm.event.space) ){
         var event = {};
         event.type = tm.event.down;
@@ -150,7 +174,7 @@ function Hero(context, rect, character, font, fontColor){
     self.setFont = function(font){
         self.font = font;
     }
-	self.weapon = [];
+    self.weapon = new tm.ActorQueue();
 
 	self.aliveDraw = function() {
         self.context.save();
@@ -177,7 +201,7 @@ function Hero(context, rect, character, font, fontColor){
         }
         if(event.type === tm.event.down){
 			if (event.code == tm.event.space) {
-				self.weapon.push(self.create_weapon());			
+				self.weapon.push(self.create_weapon());
 				return;
 			}
 
@@ -224,7 +248,7 @@ function Weapon(context, rect, character, font, fontColor){
     }
     self.aliveDraw = function() {
         self.context.save();
-		
+
 		var speed = self.rect.speed();
 		var new_speed = { x: speed.x | self.direction.x, y: speed.y | self.direction.y };
 		self.rect.speed(new_speed);
@@ -260,11 +284,11 @@ function Weapon(context, rect, character, font, fontColor){
     return self;
 }
 
-
 $(document).ready(function(){
     //var canvas = document.getElementById('#myCanvas');
     //var context = canvas.getContext("2d");
-
+    enemyQueue =  new tm.ActorQueue();
+    heroQueue = new tm.ActorQueue();
     var canvas = document.getElementById('myCanvas');
     //console.log(canvas);
     context = canvas.getContext('2d');
@@ -272,11 +296,19 @@ $(document).ready(function(){
     rect.speed({x:0,y:0});
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#396");
 
-    enemy_rect = new tm.Rect(610,710,100,100);
+    enemy_rect = new tm.Rect(610,710,100,40);
     enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#369");
+
+
+    enemy2 = new Enemy(context, new tm.Rect(610,110,100,40),"肥肥", "45pt Calibri", "#569");
+
     enemy.setHero(hero);
+    enemy2.setHero(hero);
+    enemyQueue.push(enemy);
+    enemyQueue.push(enemy2);
+
+    heroQueue.push(hero);
     var drawing_function = function(){
-		count--;
         var beginTimeStamp = Date.now();
         if( tm.event.queue.length > 0 ){
             var event = tm.event.queue.shift();
@@ -285,16 +317,26 @@ $(document).ready(function(){
 
         }
         rect.move();
-        enemy.update();
+        enemyQueue.update();
 
         tm.draw.fill(context, 800,600, '#000');
         hero.draw();
-		
-		for (var i=0; i<hero.weapon.length; ++i) {
-				hero.weapon[i].draw();
-		}
 
-        enemy.draw();
+        var intersections = heroQueue.detectIntersection(enemyQueue,false);
+        if(intersections.length !=0){
+            console.log('dead!!');
+        }
+        intersections = hero.weapon.detectIntersection(enemyQueue,false);
+        if(intersections.length !=0){
+            for (var i=0; i<intersections.length; ++i) {
+					console.log(intersections[i][0]);
+					console.log(intersections[i][1]);
+				intersections[i][0].status = tm.status.bump;
+				intersections[i][1].status = tm.status.bump;
+			}
+        }
+		hero.weapon.draw();
+        enemyQueue.draw();
 
         setTimeout(drawing_function, 30);
 
