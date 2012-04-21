@@ -296,16 +296,20 @@ $(document).ready(function(){
     rect.speed({x:0,y:0});
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#F0F");
 
-    enemy_rect = new tm.Rect(610,710,40,40);
+    enemy_rect = new tm.Rect(710,710,40,40);
     enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#39C");
 
 
     enemy2 = new Enemy(context, new tm.Rect(610,110,50,40),"肥肥", "45pt Calibri", "#FF0");
-
+    enemy3 = new Enemy(context, new tm.Rect(910,410,50,50),"趙雲", "45pt Calibri", "#FF0");
     enemy.setHero(hero);
     enemy2.setHero(hero);
+    enemy3.setHero(hero);
+
     enemyQueue.push(enemy);
     enemyQueue.push(enemy2);
+    enemyQueue.push(enemy3);
+
 
     heroQueue.push(hero);
     var drawing_function = function(){
