@@ -262,7 +262,8 @@ function Weapon(context, rect, character, font, fontColor){
 	self.alpha = 1.0;
 	self.bumpDraw = function() {
         self.context.save();
-		
+
+        self.context.translate(self.rect.x, self.rect.y);
         self.context.font = self.font;
 		self.context.fillStyle = "rgba(255, 0, 0, " + self.alpha + ")";
         self.context.fillText(self.character, 0, 0);
