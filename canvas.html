@@ -165,6 +165,10 @@ $(document).ready(function(){
     rect = new tm.Rect(10,10,100,100);
     rect.speed({x:0,y:0});
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#396");
+
+    enemy_rect = new tm.Rect(610,710,100,100);
+    enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#369");
+    enemy.setHero(hero);
     var duration = 35;
 
     var drawing_function = function(){
@@ -176,11 +180,11 @@ $(document).ready(function(){
 
         }
         rect.move();
-
+        enemy.update();
 
         tm.draw.fill(context, 600,600, '#000');
         hero.draw();
-
+        enemy.draw();
 
         setTimeout(drawing_function, 30);
 
@@ -191,5 +195,6 @@ $(document).ready(function(){
 });
 
 </script>
+<script type='text/javascript' src="enemys.js"></script>
 </body>
 </html>
