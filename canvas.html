@@ -50,7 +50,7 @@ tm.Rect.prototype.move = function(){
     var cxy = this.centerXY();
     cxy.x += this.vxy.x *3;
     cxy.y += this.vxy.y *3;
-    console.log(cxy.x + "" + cxy.y);
+    //console.log(cxy.x + "" + cxy.y);
     this.centerXY(cxy);
 }
 tm.draw = {}
@@ -80,6 +80,7 @@ tm.draw.fill = function(context, w, h, style){
 }
 
 tm.event = {};
+tm.event.space = 32;
 tm.event.keyLeft = 37;
 tm.event.keyUp = 38;
 tm.event.keyRight = 39;
@@ -91,31 +92,34 @@ tm.event.release = 1;
 
 function fill_vec(event){
     //a little hack, doc it latter.
-    if(((event.name - tm.event.keyLeft) % 2 )=== 1){
-        event.vec = {x:0, y:event.name - tm.event.keyRight};
+    if(((event.code - tm.event.keyLeft) % 2 )=== 1){
+        event.vec = {x:0, y:event.code - tm.event.keyRight};
     }
     else{
-        event.vec = {y:0, x:event.name - tm.event.keyUp};
+        event.vec = {y:0, x:event.code - tm.event.keyUp};
     }
 }
 $(document).keydown(function(e){
-    if(e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown){
+    if((e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown) || 
+	   (e.keyCode == tm.event.space) ){
         var event = {};
-        event['type']=tm.event.down;
-        event['name']= e.keyCode;
-        console.log(e.keyCode);
+        event.type = tm.event.down;
+        event.code = e.keyCode;
+        //console.log(e.keyCode);
         tm.event.queue.push(event);
     }
 });
 $(document).keyup(function(e){
-    if(e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown){
+    if((e.keyCode >= tm.event.keyLeft && e.keyCode <= tm.event.keyDown) ||
+	   (e.keyCode == tm.event.space) ){
         var event = {};
-        event['type']=tm.event.release;
-        event['name']= e.keyCode;
+        event.type = tm.event.release;
+        event.code = e.keyCode;
 
         tm.event.queue.push(event);
     }
 });
+
 function Hero(context, rect, character, font, fontColor){
     var self = this;
     self.context = context;
@@ -134,35 +138,84 @@ function Hero(context, rect, character, font, fontColor){
     self.setFont = function(font){
         self.font = font;
     }
+	self.weapon = [];
     self.accept_keyboard = function(event){
         if(event.type === tm.event.release){
+			if (event.code == tm.event.space) {
+				return;
+			}
             fill_vec(event)
 
-            var speed = rect.speed();
+            var speed = self.rect.speed();
             var new_speed = { x: speed.x ^ event.vec.x, y: speed.y ^ event.vec.y };
             self.rect.speed(new_speed);
             return;
         }
         if(event.type === tm.event.down){
+			if (event.code == tm.event.space) {
+				self.weapon.push(self.create_weapon());			
+				return;
+			}
+
             fill_vec(event)
 
-            var speed = rect.speed();
+            var speed = self.rect.speed();
             var new_speed = { x: speed.x | event.vec.x, y: speed.y | event.vec.y };
             self.rect.speed(new_speed);
             return;
         }
     }
+
+	self.create_weapon = function() {
+	    var rect = new tm.Rect(self.rect.centerXY().x,self.rect.centerXY().y,50,50);
+    	rect.speed({x:1, y:0});
+    	var myWeapon = new Weapon(self.context, rect,"喵", "20pt Calibri", "#963");
+		return myWeapon;
+	}
     return self;
 }
+
+
+function Weapon(context, rect, character, font, fontColor){
+    var self = this;
+    self.context = context;
+    self.rect = rect;
+    self.character = character;
+    self.font = font;
+    self.fontColor = fontColor;
+	self.direction = { x: 1, y: 0 };
+	self.alive = 10; // how long the weapon is kept on screen
+    self.draw = function() {
+        self.context.save();
+		
+		var speed = self.rect.speed();
+		var new_speed = { x: speed.x | self.direction.x, y: speed.y | self.direction.y };
+		self.rect.speed(new_speed);
+		self.rect.move();
+
+        self.context.translate(self.rect.x, self.rect.y);
+        self.context.font = self.font;
+        self.context.fillStyle = self.fontColor;
+        self.context.fillText(self.character, 0, 0);
+        self.context.restore();
+    }
+    self.setFont = function(font){
+        self.font = font;
+    }
+
+
+    return self;
+}
+
 
 $(document).ready(function(){
     //var canvas = document.getElementById('#myCanvas');
     //var context = canvas.getContext("2d");
 
     var canvas = document.getElementById('myCanvas');
-    console.log(canvas);
+    //console.log(canvas);
     context = canvas.getContext('2d');
-    rect = new tm.Rect(10,10,100,100);
+    rect = new tm.Rect(10,10,100,40);
     rect.speed({x:0,y:0});
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#396");
 
@@ -183,6 +236,11 @@ $(document).ready(function(){
 
         tm.draw.fill(context, 800,600, '#000');
         hero.draw();
+		
+		for (var i=0; i<hero.weapon.length; ++i) {
+				hero.weapon[i].draw();
+		}
+
         enemy.draw();
 
         setTimeout(drawing_function, 30);
