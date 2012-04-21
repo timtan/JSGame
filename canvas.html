@@ -166,10 +166,8 @@ $(document).ready(function(){
         if( tm.event.queue.length > 0 ){
             var event = tm.event.queue.shift();
 
-            (function(event){
-                hero.accept_keyboard(event);
+	hero.accept_keyboard(event);
 
-            })(event);
         }
         rect.move();
         console.log('go');
@@ -181,7 +179,6 @@ $(document).ready(function(){
         hero.draw();
 
 
-        context.restore();
         setTimeout(drawing_function, 30);
 
     };
