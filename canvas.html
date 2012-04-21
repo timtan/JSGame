@@ -168,7 +168,6 @@ $(document).ready(function(){
     context = canvas.getContext('2d');
     rect = new tm.Rect(10,10,100,100);
     rect.speed({x:0,y:0});
-    tm.draw.rect(context, '#369', rect,10);
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri");
     var duration = 35;
 
@@ -177,10 +176,8 @@ $(document).ready(function(){
         if( tm.event.queue.length > 0 ){
             var event = tm.event.queue.shift();
 
-            (function(event){
-                hero.accept_keyboard(event);
+	hero.accept_keyboard(event);
 
-            })(event);
         }
         rect.move();
         console.log('go');
@@ -192,7 +189,6 @@ $(document).ready(function(){
         hero.draw();
 
 
-        context.restore();
         setTimeout(drawing_function, 30);
 
     };
