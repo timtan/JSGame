@@ -71,7 +71,12 @@ tm.draw.rotate = function(context, angel, inner){
     context.restore();
 }
 tm.draw.fill = function(context, w, h, style){
-    context.clearRect(0,0,w,h);
+    context.beginPath();
+    context.rect(0, 0, w, h);
+    context.fillStyle = style;
+    context.fill();
+    context.closePath();
+
 }
 
 tm.event = {};
@@ -111,16 +116,18 @@ $(document).keyup(function(e){
         tm.event.queue.push(event);
     }
 });
-function Hero(context, rect, character, font){
+function Hero(context, rect, character, font, fontColor){
     var self = this;
     self.context = context;
     self.rect = rect;
     self.character = character;
     self.font = font;
+    self.fontColor = fontColor;
     self.draw = function(){
         self.context.save();
         self.context.translate(self.rect.x, self.rect.y);
         self.context.font = self.font;
+        self.context.fillStyle = self.fontColor;
         self.context.fillText(self.character, 0, 0);
         self.context.restore();
     }
@@ -147,7 +154,6 @@ function Hero(context, rect, character, font){
     }
     return self;
 }
-var angel = 10;
 
 $(document).ready(function(){
     //var canvas = document.getElementById('#myCanvas');
@@ -158,7 +164,7 @@ $(document).ready(function(){
     context = canvas.getContext('2d');
     rect = new tm.Rect(10,10,100,100);
     rect.speed({x:0,y:0});
-    hero = new Hero(context, rect,"司馬姨", "30pt Calibri");
+    hero = new Hero(context, rect,"司馬姨", "30pt Calibri", "#396");
     var duration = 35;
 
     var drawing_function = function(){
@@ -166,16 +172,13 @@ $(document).ready(function(){
         if( tm.event.queue.length > 0 ){
             var event = tm.event.queue.shift();
 
-	hero.accept_keyboard(event);
+	        hero.accept_keyboard(event);
 
         }
         rect.move();
-        console.log('go');
-        tm.draw.fill(context, 600,600, '#639');
-        angel =  angel + 10 ;
-        var cxy = rect.centerXY();
-        console.log(cxy.x + "" + cxy.y);
 
+
+        tm.draw.fill(context, 600,600, '#000');
         hero.draw();
 
 
