@@ -90,6 +90,13 @@ tm.event.queue = [];
 tm.event.down = 0;
 tm.event.release = 1;
 
+tm.status = {};
+tm.status.init = 0;
+tm.status.alive = 1;
+tm.status.bump = 2;
+tm.status.die = 3;
+
+
 function fill_vec(event){
     //a little hack, doc it latter.
     if(((event.code - tm.event.keyLeft) % 2 )=== 1){
@@ -127,18 +134,35 @@ function Hero(context, rect, character, font, fontColor){
     self.character = character;
     self.font = font;
     self.fontColor = fontColor;
+	self.status = tm.status.alive;
     self.draw = function(){
+		if (self.status == tm.status.alive) {
+			self.aliveDraw();
+		}
+
+		if (self.status == tm.status.bump) {
+			self.bumpDraw();
+		}
+    }
+	self.setStatus = function(myStatus) {
+		self.status = myStatus;
+	}
+    self.setFont = function(font){
+        self.font = font;
+    }
+	self.weapon = [];
+
+	self.aliveDraw = function() {
         self.context.save();
         self.context.translate(self.rect.x, self.rect.y);
         self.context.font = self.font;
         self.context.fillStyle = self.fontColor;
         self.context.fillText(self.character, 0, 0);
         self.context.restore();
-    }
-    self.setFont = function(font){
-        self.font = font;
-    }
-	self.weapon = [];
+	}
+	self.bumpDraw = function() {
+		
+	}
     self.accept_keyboard = function(event){
         if(event.type === tm.event.release){
 			if (event.code == tm.event.space) {
@@ -184,8 +208,18 @@ function Weapon(context, rect, character, font, fontColor){
     self.font = font;
     self.fontColor = fontColor;
 	self.direction = { x: 1, y: 0 };
-	self.alive = 10; // how long the weapon is kept on screen
-    self.draw = function() {
+	//self.alive = 10; // how long the weapon is kept on screen
+	self.status = tm.status.alive;
+    self.draw = function(){
+		if (self.status == tm.status.alive) {
+			self.aliveDraw();
+		}
+
+		if (self.status == tm.status.bump) {
+			self.bumpDraw();
+		}
+    }
+    self.aliveDraw = function() {
         self.context.save();
 		
 		var speed = self.rect.speed();
@@ -199,6 +233,12 @@ function Weapon(context, rect, character, font, fontColor){
         self.context.fillText(self.character, 0, 0);
         self.context.restore();
     }
+	self.bumpDraw = function() {
+		
+	}
+	self.setStatus = function(myStatus) {
+		self.status = myStatus;
+	}
     self.setFont = function(font){
         self.font = font;
     }
