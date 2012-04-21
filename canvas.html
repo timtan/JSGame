@@ -54,17 +54,7 @@ tm.Rect.prototype.move = function(){
     this.centerXY(cxy);
 }
 tm.draw = {}
-tm.draw.rect = function(context, color, rect, width){
-    if(!width){width=0}
-    context.save();
-    context.beginPath();
-    context.rect(0, 0, rect.width, rect.height);
-    context.closePath();
-    context.fill();
 
-    context.restore();
-
-}
 
 
 tm.draw.translate = function(context, x,y, inner){
@@ -168,7 +158,6 @@ $(document).ready(function(){
     context = canvas.getContext('2d');
     rect = new tm.Rect(10,10,100,100);
     rect.speed({x:0,y:0});
-    tm.draw.rect(context, '#369', rect,10);
     hero = new Hero(context, rect,"司馬姨", "30pt Calibri");
     var duration = 35;
 
@@ -200,6 +189,7 @@ $(document).ready(function(){
 
 
 });
+
 </script>
 </body>
 </html>
