@@ -331,8 +331,13 @@ $(document).ready(function(){
             for (var i=0; i<intersections.length; ++i) {
 					console.log(intersections[i][0]);
 					console.log(intersections[i][1]);
-				intersections[i][0].status = tm.status.bump;
-				intersections[i][1].status = tm.status.bump;
+                if(intersections[i][0].status == tm.status.alive){
+				    intersections[i][0].status = tm.status.bump;
+                }
+                if(intersections[i][1].status == tm.status.alive){
+
+                    intersections[i][1].status = tm.status.bump;
+                }
 			}
         }
 		hero.weapon.draw();
