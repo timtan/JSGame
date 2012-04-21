@@ -218,6 +218,9 @@ function Weapon(context, rect, character, font, fontColor){
 		if (self.status == tm.status.bump) {
 			self.bumpDraw();
 		}
+		if (self.status == tm.status.die) {
+			
+		}
     }
     self.aliveDraw = function() {
         self.context.save();
@@ -233,8 +236,19 @@ function Weapon(context, rect, character, font, fontColor){
         self.context.fillText(self.character, 0, 0);
         self.context.restore();
     }
+	self.alpha = 1.0;
 	self.bumpDraw = function() {
+        self.context.save();
 		
+        self.context.font = self.font;
+		self.context.fillStyle = "rgba(255, 0, 0, " + self.alpha + ")";
+        self.context.fillText(self.character, 0, 0);
+        self.context.restore();
+
+		self.alpha = self.alpha - 0.05;
+		if (self.alpha == 0) {
+			self.status = tm.status.die;
+		}
 	}
 	self.setStatus = function(myStatus) {
 		self.status = myStatus;
@@ -242,7 +256,6 @@ function Weapon(context, rect, character, font, fontColor){
     self.setFont = function(font){
         self.font = font;
     }
-
 
     return self;
 }
@@ -262,8 +275,8 @@ $(document).ready(function(){
     enemy_rect = new tm.Rect(610,710,100,100);
     enemy = new Enemy(context, enemy_rect,"張飛", "50pt Calibri", "#369");
     enemy.setHero(hero);
-
     var drawing_function = function(){
+		count--;
         var beginTimeStamp = Date.now();
         if( tm.event.queue.length > 0 ){
             var event = tm.event.queue.shift();
